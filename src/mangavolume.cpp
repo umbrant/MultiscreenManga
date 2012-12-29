@@ -29,13 +29,36 @@ DirectoryMangaVolume::DirectoryMangaVolume(const QString & dirpath, QObject *par
 
 CompressedFileMangaVolume::CompressedFileMangaVolume(const QString & filepath, QObject *parent)
     : DirectoryMangaVolume(true,parent) {
+
+    struct archive *a;
+    struct archive_entry *entry;
+    int r;
+
+    char* filename = filepath.to_char(); // XXX
+
+    a = archive_read_new();
+    archive_read_support_filter_all(a);
+    archive_read_support_format_all(a);
+    r = archive_read_open_filename(a, filename, 8*1024*1024);
+    if (r != ARCHIVE_OK) {
+        return -1;
+    }
+    while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
+        printf("%s\n",archive_entry_pathname(entry));
+        archive_read_data_skip(a);  // Note 2
+    }
+    r = archive_read_free(a);  // Note 3
+    if (r != ARCHIVE_OK) {
+        return -1;
+    }
+
+    /*
     QStringList path_split = filepath.split("/");
     QString filename = path_split.last();
     QStringList filename_split = filename.split(".");
     if (filename_split.length() > 1) {
         filename_split.pop_back();
     }
-
 
     QDir dir;
     do {
@@ -53,10 +76,6 @@ CompressedFileMangaVolume::CompressedFileMangaVolume(const QString & filepath, Q
         dir = QDir(m_file_dir);
     } while (dir.exists());
     dir.mkpath(".");
-
-
-
-
 
     QString program = "";
     QStringList arguments;
@@ -105,11 +124,16 @@ CompressedFileMangaVolume::CompressedFileMangaVolume(const QString & filepath, Q
     // Successful extraction
     qWarning() << "Extracted successfully";
     m_do_cleanup = true;
+
+    // Read each of the extracted files into m_pages<MangaPage>
     readImages(m_file_dir);
+
+    // XXX(umbrant): Looks like dead code?
     for (const MangaPage& page: m_pages) {
         page.getFilename().size();
         // TODO(mtao): processing?
     }
+    */
 }
 
 
@@ -125,6 +149,7 @@ std::shared_ptr<const QImage> DirectoryMangaVolume::getImage(uint page_num, QPoi
 void DirectoryMangaVolume::readImages(const QString & path) {
     QFileInfo fileInfo(path);
     if (fileInfo.isDir()) {
+        // Recurse into sub-directories
         QDir dir(path);
         QStringList fileList = dir.entryList(
                     QDir::AllEntries | QDir::NoDotAndDotDot
@@ -143,7 +168,6 @@ void DirectoryMangaVolume::readImages(const QString & path) {
                 m_pages.push_back(img);
             }
         }
-
     }
 }
 
@@ -164,7 +188,6 @@ void CompressedFileMangaVolume::cleanUp(const QString &path) {
         QFile::remove(path);
     }
 }
-
 
 
 PDFMangaVolume::PDFMangaVolume(const QString filepath, QObject *parent): MangaVolume(false, parent){

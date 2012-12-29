@@ -9,25 +9,26 @@
 #include <memory>
 #include <set>
 
+#include <archive.h>
+#include <archive_entry.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 class MangaPage
 {
 public:
     MangaPage(const QString & path): filepath(path)
       , filename(filepath.split("/").last())
       ,data(new QImage(path))
-    {}/*
-    MangaPage(const QImage & data, const QString & path):
-        filepath(path)
-      , filename(filepath.split("/").last())
-      , data(data)
-    {}*/
+    {}
 
-
-    bool isNull()const {if(!data) return true; return data->isNull();}
-    const QString & getFilepath()const {return filepath;}
-    const QString & getFilename()const {return filename;}
-    std::shared_ptr<const QImage> getData()const {return data;}
-
+    bool isNull() const {if(!data) return true; return data->isNull();}
+    const QString & getFilepath() const {return filepath;}
+    const QString & getFilename() const {return filename;}
+    std::shared_ptr<const QImage> getData() const {return data;}
 
 private:
     QString filepath;
