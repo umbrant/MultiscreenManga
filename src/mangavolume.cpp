@@ -30,24 +30,29 @@ DirectoryMangaVolume::DirectoryMangaVolume(const QString & dirpath, QObject *par
 CompressedFileMangaVolume::CompressedFileMangaVolume(const QString & filepath, QObject *parent)
     : DirectoryMangaVolume(true,parent) {
 
+    QByteArray ba = str1.toLocal8Bit();
+    const char *filename = ba.data();
+
     struct archive *a;
     struct archive_entry *entry;
     int r;
 
-    char* filename = filepath.to_char(); // XXX
-
+    // Initialize archive struct
     a = archive_read_new();
     archive_read_support_filter_all(a);
     archive_read_support_format_all(a);
+    // Attempt opening the file as an archive
     r = archive_read_open_filename(a, filename, 8*1024*1024);
     if (r != ARCHIVE_OK) {
         return -1;
     }
+    // Iterate through the files in the archive
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
         printf("%s\n",archive_entry_pathname(entry));
-        archive_read_data_skip(a);  // Note 2
+        archive_read_data_skip(a);
     }
-    r = archive_read_free(a);  // Note 3
+    // Cleanup
+    r = archive_read_free(a);
     if (r != ARCHIVE_OK) {
         return -1;
     }

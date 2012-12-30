@@ -17,6 +17,7 @@
 #include <string.h>
 #include <unistd.h>
 
+
 class MangaPage
 {
 public:
@@ -26,13 +27,9 @@ public:
     {}
 
     bool isNull() const {if(!data) return true; return data->isNull();}
-    const QString & getFilepath() const {return filepath;}
-    const QString & getFilename() const {return filename;}
     std::shared_ptr<const QImage> getData() const {return data;}
 
 private:
-    QString filepath;
-    QString filename;
     std::shared_ptr<QImage> data;
 };
 
@@ -66,7 +63,6 @@ public:
 
 protected:
     std::vector<MangaPage> m_pages;
-    static const std::set<QString> m_valid_extensions;
 
     virtual void readImages(const QString & path);
 };
