@@ -16,7 +16,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 # Source files
 SET(MultiscreenManga_SOURCES src/main.cpp  src/mainwindow.cpp  src/mangavolume.cpp  src/renderwidget.cpp)
 # Include files
-SET(MultiscreenManga_HEADERS include/mainwindow.h include/mangavolume.h include/renderwidget.h)
+SET(MultiscreenManga_HEADERS include/mainwindow.h include/mangavolume.h include/renderwidget.h include/configuration.h)
 SET(MultiscreenManga_SOURCES ${MultiscreenManga_SOURCES} ${MultiscreenManga_HEADERS})
 
 # Qt
