@@ -17,6 +17,12 @@ class ConfigurationHidden
 {
 public:
     friend class Configuration;
+    QList<QString> supportedImageFormats;
+protected:
+    static ConfigurationHidden & Instance() {
+        static ConfigurationHidden * ch = new ConfigurationHidden();
+        return *ch;
+    }
 private:
     ConfigurationHidden()
     {
@@ -27,15 +33,16 @@ private:
             supportedImageFormats.push_back(*str);
         }
     }
-    static QList<QString> supportedImageFormats;
+
 };
 
 class Configuration
 {
 private:
-    static ConfigurationHidden config;
+    ConfigurationHidden config;
 public:
-    const QList<QString> getSupportedImageFormats() const {
+    Configuration(): config(ConfigurationHidden::Instance()) {}
+    const QList<QString> & getSupportedImageFormats() const {
         return config.supportedImageFormats;
     }
 };
